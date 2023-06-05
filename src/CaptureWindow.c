@@ -14,7 +14,9 @@
 //
 
 #define STRICT
+#if !defined(WIN32_LEAN_AND_MEAN)
 #define WIN32_LEAN_AND_MEAN
+#endif
 
 #include <windows.h>
 
@@ -66,7 +68,7 @@ static HPALETTE GetSystemPalette(HDC hdc)
 
    // set some important fields
    pLogPal->palVersion = PALVERSION;
-   pLogPal->palNumEntries = nColors;
+   pLogPal->palNumEntries = (WORD)nColors;
 
    //Copy the current system palette into our logical palette */
    GetSystemPaletteEntries(hdc, 0, nColors, (LPPALETTEENTRY)(pLogPal->palPalEntry));

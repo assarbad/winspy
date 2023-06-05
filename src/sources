@@ -1,0 +1,75 @@
+TARGETNAME=WinSpy
+!if $(386)
+TARGETNAME=$(TARGETNAME)32
+!elseif $(AMD64)
+TARGETNAME=$(TARGETNAME)64
+!endif
+
+TARGETPATH=obj
+TARGETTYPE=PROGRAM
+UNICODE=1
+BUILD_ALLOW_ALL_WARNINGS=1
+UMTYPE=windows
+USE_MSVCRT=1
+USE_STATIC_ATL=1
+ATL_VER=70
+USE_NATIVE_EH=1
+USE_RTTI=1
+# Not tested on Itanium, use at your own risk ... and if you do it, report back, please
+DDK_BLOCK_ON_IA64=1
+
+# Use additional include file
+#NTTARGETFILES=makefile.inc
+
+C_DEFINES=$(C_DEFINES) /DDDKBUILD
+
+!IF defined(UNICODE) && $(UNICODE)
+UMENTRY=wwinmain
+C_DEFINES=$(C_DEFINES) /DUNICODE /D_UNICODE
+!ELSE
+UMENTRY=winmain
+C_DEFINES=$(C_DEFINES) /DMBCS /D_MBCS
+!ENDIF
+
+INCLUDES=$(DDK_INC_PATH);$(CRT_INC_PATH);$(SDK_INC_PATH);..\resource;..
+
+
+TARGETLIBS=\
+		$(SDK_LIB_PATH)\kernel32.lib \
+		$(SDK_LIB_PATH)\user32.lib \
+		$(SDK_LIB_PATH)\comctl32.lib \
+		$(SDK_LIB_PATH)\ole32.lib \
+		$(SDK_LIB_PATH)\shell32.lib \
+		$(SDK_LIB_PATH)\uxtheme.lib \
+		$(SDK_LIB_PATH)\version.lib
+
+SOURCES=\
+		BitmapButton.c \
+		CaptureWindow.c \
+		DisplayClassInfo.c \
+		DisplayGeneralInfo.c \
+		DisplayProcessInfo.c \
+		DisplayPropInfo.c \
+		DisplayScrollInfo.c \
+		DisplayStyleInfo.c \
+		DisplayWindowInfo.c \
+		EditSize.c \
+		EditWindow.c \
+		FindTool.c \
+		FindToolTrans.c \
+		FunkyList.c \
+		GetRemoteWindowInfo.c \
+		InjectThread.c \
+		Options.c \
+		RegHelper.c \
+		StaticCtrl.c \
+		StyleEdit.c \
+		TabCtrlUtils.c \
+		Utils.c \
+		WindowFromPointEx.c \
+		WinSpy.c \
+		WinSpyCommand.c \
+		WinSpyDlgs.c \
+		WinSpyTree.c \
+		WinSpyWindow.c \
+		LoadPNG.cpp

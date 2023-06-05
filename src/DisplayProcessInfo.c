@@ -10,27 +10,31 @@
 //
 
 #define STRICT
+#if !defined(WIN32_LEAN_AND_MEAN)
 #define WIN32_LEAN_AND_MEAN
+#endif
 
 #include <windows.h>
 #include <tchar.h>
+#ifndef DDKBUILD
 #include <psapi.h>
+#include <tlhelp32.h>
+#endif
 
 #include "WinSpy.h"
 #include "resource.h"
 
-#include <tlhelp32.h>
 
-
+#ifndef DDKBUILD
 typedef BOOL  (WINAPI * EnumProcessModulesProc )(HANDLE, HMODULE *, DWORD, LPDWORD);
 typedef DWORD (WINAPI * GetModuleBaseNameProc  )(HANDLE, HMODULE, LPTSTR, DWORD);
 typedef DWORD (WINAPI * GetModuleFileNameExProc)(HANDLE, HMODULE, LPTSTR, DWORD);
 
 BOOL GetProcessNameByPid1(DWORD dwProcessId, TCHAR szName[], DWORD nNameSize, TCHAR szPath[], DWORD nPathSize)
 {
+	BOOL fFound = FALSE;
 	HANDLE h = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
 	PROCESSENTRY32 pe = { sizeof(pe) };
-	BOOL fFound = FALSE;
 
 	szPath[0] = '\0';
 	szName[0] = '\0';
@@ -64,7 +68,7 @@ BOOL GetProcessNameByPid1(DWORD dwProcessId, TCHAR szName[], DWORD nNameSize, TC
 	return fFound;
 }
 
-
+#endif
 //
 // This uses PSAPI.DLL, which is only available under NT/2000/XP I think,
 // so we dynamically load this library, so that we can still run under 9x.
@@ -77,6 +81,7 @@ BOOL GetProcessNameByPid1(DWORD dwProcessId, TCHAR szName[], DWORD nNameSize, TC
 //
 BOOL GetProcessNameByPid(DWORD dwProcessId, TCHAR szName[], DWORD nNameSize, TCHAR szPath[], DWORD nPathSize)
 {
+#ifndef DDKBUILD
 	HMODULE hPSAPI;
 	HANDLE hProcess;
 
@@ -145,6 +150,7 @@ BOOL GetProcessNameByPid(DWORD dwProcessId, TCHAR szName[], DWORD nNameSize, TCH
 	
 	CloseHandle(hProcess);
 	FreeLibrary(hPSAPI);
+#endif
 
 	return TRUE;
 }
@@ -170,7 +176,7 @@ void SetProcessInfo(HWND hwnd)
 	// Thread Id
 	wsprintf(ach, _T("%08X  (%u)"), dwThreadId, dwThreadId);
 	SetDlgItemText(hwndDlg, IDC_TID, ach);
-
+#ifndef DDKBUILD
 	// Try to get process name and path
 	if(GetProcessNameByPid(dwProcessId, ach,    sizeof(ach)    / sizeof(TCHAR),
 										szPath, sizeof(szPath) / sizeof(TCHAR)))
@@ -180,9 +186,11 @@ void SetProcessInfo(HWND hwnd)
 	}
 	else
 	{
+#endif
 		SetDlgItemText(hwndDlg, IDC_PROCESSNAME, _T("N/A"));
 		SetDlgItemText(hwndDlg, IDC_PROCESSNAME, _T("N/A"));
+#ifndef DDKBUILD
 	}
-
+#endif
 
 }

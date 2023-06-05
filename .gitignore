@@ -31,4 +31,9 @@ ipch/
 .vs/
 
 
-
+# DDKBUILD
+*.err
+*.log
+*.wrn
+objfre_*/
+objchk_*/
